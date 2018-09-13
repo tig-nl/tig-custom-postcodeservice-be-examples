@@ -1,4 +1,4 @@
-# TIG Postcode service examples
+# TIG Postcode service BE examples
 
 ### Information
 This repository provides several usage examples of our Postcode BE service that you can implement in your environment immediately. For more information about our Postcodeservice BE please visit https://tig.nl/postcode-service-be/.
