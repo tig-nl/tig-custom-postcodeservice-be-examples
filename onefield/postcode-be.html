@@ -1,0 +1,224 @@
+<html>
+<head>
+	<title>Postcode BE</title>
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css" rel="stylesheet">
+	<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+	<style type="text/css">
+	       .row {
+	           float: left;
+	           padding: 10px 0;
+	           clear: both;
+	           width: 100%;
+	       }
+	       .number {
+	           padding: 10px;
+	           border-radius: 5%;
+	           background: #0088cc;
+	           float: left;
+	           width: 50px;
+	           height: 50px;
+	           text-align: center;
+	           color: white;
+	           margin-top: 23px;
+	       }
+	       .number.disabled {
+	           background: #99cfeb;
+	       }
+	       .row.two .form-group .form {
+	           float: left;
+	           width: calc(50% - 10px);
+	       }
+	       .row.two .form-group .form:nth-child(2) {
+	           margin-left: 20px;
+	           float: left;
+	           width: calc(50% - 10px);
+	       }
+	       .form-group {
+	           float: right;
+	           position: relative;
+	           width: calc(100% - 80px);
+	       }
+	       .form-group label, .form-group input {
+	           float: left;
+	           width: 100%;
+	       }
+	       input[type=text] {
+	           height: 44px;
+	       }
+	       input[type=text]:disabled {
+	           background: #f2f2f2;
+	       }
+	       .loadersmall {
+	           position: absolute;
+	           left: calc(100% - 52px);
+	           top: 37px;
+	           border: 3px solid #bebdbd;
+	           -webkit-animation: spin 1s linear infinite;
+	           animation: spin 1s linear infinite;
+	           border-top: 3px solid #0088cc;
+	           border-radius: 50%;
+	           width: 23px;
+	           height: 23px;
+	           float: left;
+	           margin-left: 10px;
+	           margin-top: 5px;
+	       }
+	       @keyframes spin {
+	           0% {
+	               transform: rotate(0deg);
+	           }
+	           100% {
+	               transform: rotate(360deg);
+	           }
+	       }
+	       .ui-widget.ui-widget-content {
+	           border: 1px solid #c5c5c5;
+	           max-height: 400px;
+	           overflow-y: scroll;
+	           box-sizing: border-box;
+	           overflow-x: hidden;
+	       }
+	</style>
+</head>
+<body>
+<div class="container">
+  <div class="row one">
+    <div class="number">
+      <span>1</span>
+    </div>
+    <div class="form-group">
+      <label for="street">Straat</label> <input class="form-control" id="street" type="text">
+      <div class="loadersmall" style="display:none"></div>
+    </div>
+  </div>
+  <div class="row two">
+    <div class="number">
+      <span>2</span>
+    </div>
+    <div class="form-group">
+      <div class="form">
+        <label for="housenumber">Huisnummer</label> <input class="form-control" id="housenumber" type="text">
+      </div>
+      <div class="form">
+        <label for="bus">Bus</label> <input class="form-control" id="bus" type="text">
+      </div>
+    </div>
+  </div>
+  <div class="row three">
+    <div class="number">
+      <span>3</span>
+    </div>
+    <div class="form-group">
+      <label for="city">Plaats</label> <input class="form-control" id="city" type="text">
+    </div>
+  </div>
+  <div class="row four">
+    <div class="number">
+      <span>4</span>
+    </div>
+    <div class="form-group">
+      <label for="postcode">Postcode</label> <input class="form-control" id="postcode" type="text">
+    </div>
+  </div>
+  </div>
+<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+	<script type="text/javascript">
+		jQuery( function ($) {
+	           var postcode = $('#postcode'),
+	           housenumber = $('#housenumber'),
+	           street = $('#street'),
+	           city = $('#city');
+	           loader = $('.loadersmall');
+
+	           function addDisabled() {
+	               $('.row.three .number').addClass('disabled');
+	               $('.row.four .number').addClass('disabled');
+	               city.attr('disabled', true);
+	               postcode.attr('disabled', true);
+	           }
+
+	           function removeDisabled() {
+	               $('.row.three .number').removeClass('disabled');
+	               $('.row.four .number').removeClass('disabled');
+	               city.attr('disabled', false);
+	               postcode.attr('disabled', false);
+	           }
+	           var delay = (function() {
+	               var timer = 0;
+	               return function(callback, ms) {
+	                   clearTimeout(timer);
+	                   timer = setTimeout(callback, ms);
+	               };
+	           })();
+
+	           addDisabled()
+	           loader.hide();
+
+	           street.autocomplete({
+	               source: function(request, response) {
+	                   $.ajax({
+	                       url: 'https://postcode-be.tig.nl/api/be/find',
+	                       data: {
+	                           street: request.term
+	                       },
+	                       dataType: "json",
+	                       success: response,
+	                       beforeSend: function() {
+	                           loader.show();
+	                       },
+	                       error: function() {
+	                           response([]);
+	                       },
+	                       complete: function() {
+	                           loader.hide();
+	                       }
+	                   });
+	               },
+	               select: function(event, ui) {
+	                   if (ui.item.type === 'Address') {
+	                       findAddress(ui.item);
+	                       return;
+	                   }
+	                   housenumber.focus();
+	                   removeDisabled()
+	                   postcode.val(ui.item.postcode);
+	                   city.val(ui.item.city);
+	                   setTimeout(function() {
+	                       street.val(ui.item.street);
+	                   });
+	               },
+	               minLength: 2
+	           });
+
+	           function findAddress(item) {
+	               $.ajax({
+	                   url: 'https://postcode-be.tig.nl/api/be/collect',
+	                   method: 'POST',
+	                   dataType: 'json',
+	                   data: {
+	                       id: item.id
+	                   },
+	                   success: function(result) {
+	                       street.val(result.street);
+	                       housenumber.val(result.housenumber);
+	                       postcode.val(result.postcode);
+	                       city.val(result.city);
+	                       housenumber.focus();
+	                   }
+	               });
+	           }
+	           $('#street').blur(function() {
+	               if ($(this).val().length === 0) {
+	                   addDisabled();
+	                   postcode.val('');
+	                   city.val('');
+	                   loader.hide();
+	               } else {
+	                   removeDisabled();
+	               }
+	           });
+	       });
+	</script>
+</body>
+</html>
