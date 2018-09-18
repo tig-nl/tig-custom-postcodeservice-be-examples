@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Postcode BE</title>
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="https://jqueryui.com/jquery-wp-content/themes/jqueryui.com/style.css">
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+	<style type="text/css">
+	       .row {
+	           float: left;
+	           padding: 10px 0;
+	           clear: both;
+	           width: 100%;
+	       }
+	       .number {
+	           padding: 10px;
+	           border-radius: 5%;
+	           background: #0088cc;
+	           float: left;
+	           width: 50px;
+	           height: 50px;
+	           text-align: center;
+	           color: white;
+	           margin-top: 23px;
+	       }
+	       .number.disabled {
+	           background: #99cfeb;
+	       }
+	       .row.tree .form-group .form {
+	           float: left;
+	           width: calc(50% - 10px);
+	       }
+	       .row.tree .form-group .form:nth-child(2) {
+	           margin-left: 20px;
+	           float: left;
+	           width: calc(50% - 10px);
+	       }
+	       .form-group {
+	           float: right;
+	           position: relative;
+	           width: calc(100% - 80px);
+	       }
+	       .form-group label, .form-group input {
+	           float: left;
+	           width: 100%;
+	       }
+	       input[type=text] {
+	           height: 44px;
+	       }
+	       input[type=text]:disabled {
+	           background: #f2f2f2;
+	       }
+	       .loadersmall {
+	           position: absolute;
+	           left: calc(100% - 52px);
+	           top: 37px;
+	           border: 3px solid #bebdbd;
+	           -webkit-animation: spin 1s linear infinite;
+	           animation: spin 1s linear infinite;
+	           border-top: 3px solid #0088cc;
+	           border-radius: 50%;
+	           width: 23px;
+	           height: 23px;
+	           float: left;
+	           margin-left: 10px;
+	           margin-top: 5px;
+	       }
+	       @keyframes spin {
+	           0% {
+	               transform: rotate(0deg);
+	           }
+	           100% {
+	               transform: rotate(360deg);
+	           }
+	       }
+	       .ui-widget.ui-widget-content {
+	           border: 1px solid #c5c5c5;
+	           max-height: 400px;
+	           overflow-y: scroll;
+	           box-sizing: border-box;
+	           overflow-x: hidden;
+	       }
+	        .ui-autocomplete-loading {
+    			background: white url("images/ui-anim_basic_16x16.gif") right center no-repeat;
+  			}
+	</style>
+  
+</head>
+<body>
+ 
+<div class="container">
+  <div class="row one">
+    <div class="number">
+      <span>1</span>
+    </div>
+    <div class="form-group">
+      <label for="zipcodezone">Postcode en gemeente</label> 
+      <input class="form-control" id="zipcodezone" type="text">
+    </div>
+	</div>
+   <div class="row two">
+    <div class="number">
+      <span>2</span>
+    </div>
+    <div class="form-group">
+      <label for="straatnaam">Straatnaam</label> 
+      <input class="form-control" id="straatnaam" type="text">
+    </div>
+  </div>
+   <div class="row tree">
+    <div class="number">
+      <span>2</span>
+    </div>
+    <div class="form-group">
+      <div class="form">
+        <label for="housenumber">Huisnummer</label> <input class="form-control" id="housenumber" type="text">
+      </div>
+      <div class="form">
+        <label for="bus">Bus</label> <input class="form-control" id="bus" type="text">
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+  <script>
+  $( function() {
+    
+	$( "#straatnaam" ).prop( "disabled", true );
+
+    var memPostcode;
+    var memPlaats;
+
+    $('#zipcodezone').autocomplete({
+      source: function( request, response ) {
+        $.ajax( {
+          url: "https://postcode-be.tig.nl/api/be/postcode-find",
+          data: {
+            zipcodezone: request.term
+          },
+          success: function( data ) {
+          	var selectBoxArr = new Array();
+          	$.each(data, function(key, value) {
+          		 selectBoxArr.push(data[key].postcode + ' - ' + data[key].plaats);
+          	});
+
+            response(selectBoxArr);
+          }
+        } );
+      },
+      minLength: 1,
+      select: function( event, ui ) {
+      	selectedResult = ui.item.value;
+      	var spliteSelectedResult = selectedResult.split(' - ');
+      	memPostcode = spliteSelectedResult[0];
+      	memPlaats = spliteSelectedResult[1];
+		$( "#straatnaam" ).prop( "disabled", false );
+      }
+    });
+
+
+    $('#straatnaam').autocomplete({
+      source: function( request, response ) {
+        $.ajax( {
+          url: "https://postcode-be.tig.nl/api/be/street-find?zipcode=" + memPostcode + "&city=" + memPlaats,
+          data: {
+            street: request.term
+          },
+          success: function( data ) {
+          	var selectBoxStreetArr = new Array();
+
+            $.each(data, function(key, value) {
+          		 selectBoxStreetArr.push(data[key].straat);
+          	});
+          	response(selectBoxStreetArr);
+          }
+        } );
+      },
+      minLength: 1,
+      select: function( event, ui ) {
+      	 
+      }
+    });
+
+    $('#zipcodezone').blur(function() {
+    	if ($(this).val().length === 0) {
+    		$( "#straatnaam" ).prop( "disabled", true );
+    	} 
+    });
+
+  });
+  </script>
+ 
+</body>
+</html>
