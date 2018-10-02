@@ -26,6 +26,7 @@ $( function() {
         },
         minLength: 1,
         select: function( event, ui ) {
+            $( "#streetName" ).val("");
             selectedResult = ui.item.value;
             var spliteSelectedResult = selectedResult.split(' - ');
             memPostalcode = spliteSelectedResult[0];
@@ -53,10 +54,7 @@ $( function() {
                 }
             } );
         },
-        minLength: 1,
-        select: function( event, ui ) {
-
-        }
+        minLength: 1
     });
 
     $('#zipcodezone').blur(function() {
@@ -64,5 +62,12 @@ $( function() {
             $( "#streetName" ).prop( "disabled", true );
         }
     });
+
+    $('#zipCodeZone').change(function () {
+        if ($(this).val().length === 0) {
+            $( "#streetName" ).val("");
+            $( "#streetName" ).prop( "disabled", true );
+        }
+    })
 
 });
