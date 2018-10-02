@@ -34,7 +34,6 @@ $( function() {
         }
     });
 
-
     $('#streetName').autocomplete({
         delay: 1000,
         source: function( request, response ) {
