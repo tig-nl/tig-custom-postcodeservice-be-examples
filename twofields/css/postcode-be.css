@@ -1,0 +1,87 @@
+
+/* Table styling -----------------------------------------------------------------------------------------------------*/
+
+.row {
+    float: left;
+    padding: 10px 0;
+    clear: both;
+    width: 100%;
+}
+.row.tree .form-group .form {
+    float: left;
+    width: calc(50% - 10px);
+}
+.row.tree .form-group .form:nth-child(2) {
+    margin-left: 20px;
+    float: left;
+    width: calc(50% - 10px);
+}
+
+/* Form styling ------------------------------------------------------------------------------------------------------*/
+
+.number {
+    padding: 10px;
+    border-radius: 5%;
+    background: #0088cc;
+    float: left;
+    width: 50px;
+    height: 50px;
+    text-align: center;
+    color: white;
+    margin-top: 23px;
+}
+.number.disabled {
+    background: #99cfeb;
+}
+
+.form-group {
+    float: right;
+    position: relative;
+    width: calc(100% - 80px);
+}
+.form-group label, .form-group input {
+    float: left;
+    width: 100%;
+}
+input[type=text] {
+    height: 44px;
+}
+input[type=text]:disabled {
+    background: #f2f2f2;
+}
+.loadersmall {
+    position: absolute;
+    left: calc(100% - 52px);
+    top: 37px;
+    border: 3px solid #bebdbd;
+    -webkit-animation: spin 1s linear infinite;
+    animation: spin 1s linear infinite;
+    border-top: 3px solid #0088cc;
+    border-radius: 50%;
+    width: 23px;
+    height: 23px;
+    float: left;
+    margin-left: 10px;
+    margin-top: 5px;
+}
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* UI widget ---------------------------------------------------------------------------------------------------------*/
+
+.ui-widget.ui-widget-content {
+    border: 1px solid #c5c5c5;
+    max-height: 400px;
+    overflow-y: scroll;
+    box-sizing: border-box;
+    overflow-x: hidden;
+}
+.ui-autocomplete-loading {
+    background: white url("images/ui-anim_basic_16x16.gif") right center no-repeat;
+}
